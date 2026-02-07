@@ -35,3 +35,7 @@ coverage
 
 # emacs backup files
 *~
+
+# Docker artifacts
+.docker-home/
+regression_log*.txt
