@@ -61,4 +61,28 @@ class TestInstruction < Minitest::Test
     extracted = rs1_var.extract
     refute_match(/sext/, extracted, "non-signed decode variable should not use sext")
   end
+
+  def test_explicit_pc_metadata
+    db = @cfg_arch
+
+    auipc_inst = db.instructions.find { |i| i.name == "auipc" }
+    refute_nil auipc_inst, "AUIPC instruction should be found"
+    assert auipc_inst.pc_references?, "AUIPC should explicitly reference the PC"
+    refute auipc_inst.pc_changes?, "AUIPC should not explicitly change the PC"
+
+    jalr_inst = db.instructions.find { |i| i.name == "jalr" }
+    refute_nil jalr_inst, "JALR instruction should be found"
+    assert jalr_inst.pc_references?, "JALR should explicitly reference the PC"
+    assert jalr_inst.pc_changes?, "JALR should explicitly change the PC"
+
+    mret_inst = db.instructions.find { |i| i.name == "mret" }
+    refute_nil mret_inst, "MRET instruction should be found"
+    refute mret_inst.pc_references?, "MRET should not explicitly reference the current PC"
+    assert mret_inst.pc_changes?, "MRET should explicitly change the PC"
+
+    add_inst = db.instructions.find { |i| i.name == "add" }
+    refute_nil add_inst, "ADD instruction should be found"
+    refute add_inst.pc_references?, "Instructions without pc metadata should default to not referencing the PC"
+    refute add_inst.pc_changes?, "Instructions without pc metadata should default to not changing the PC"
+  end
 end
