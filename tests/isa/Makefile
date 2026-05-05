@@ -85,5 +85,13 @@ riscv_tests:
 # Clean up
 
 clean:
-	$(MAKE) -C $(riscv_tests_dir)/isa XLEN=$(XLEN) clean
+	@if [ -d "$(riscv_tests_dir)/isa" ] && [ -f "$(riscv_tests_dir)/isa/Makefile" ]; then \
+		if command -v "$(RISCV_GCC)" > /dev/null 2>&1; then \
+			$(MAKE) -C $(riscv_tests_dir)/isa XLEN=$(XLEN) clean; \
+		else \
+			echo "Skipping $(riscv_tests_dir)/isa clean: $(RISCV_GCC) not found"; \
+		fi; \
+	else \
+		echo "Skipping $(riscv_tests_dir)/isa clean: submodule not initialized"; \
+	fi
 	rm -rf $(junk)
